@@ -1,0 +1,12 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+.git
+.venv
+console-plugin
+tests
+wzh-steps
+wzh-solution
+dist
+wzh-assets
+__pycache__
+*.pyc
+artifacts

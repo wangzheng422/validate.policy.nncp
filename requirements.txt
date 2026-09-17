@@ -1,0 +1,2 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+PyYAML==6.0.2

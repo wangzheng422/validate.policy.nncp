@@ -1,0 +1,34 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+# A single installation per cluster is supported. Resource names are fixed.
+backend:
+  image: quay.io/wangzheng422/network-guardrail@sha256:00f31dafad5b0cba7bdd1c74e62774a4b8f6a16c019ae82587e225d0e52cd892
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests: {cpu: 50m, memory: 128Mi}
+    limits: {cpu: 500m, memory: 512Mi}
+controller:
+  intervalSeconds: 60
+api:
+  replicas: 1
+plugin:
+  enabled: true
+  register: true
+  image: quay.io/wangzheng422/network-guardrail-console@sha256:d46a3e350e25a258ae718c933b3cd5d99de2c2844d39da748b0d5ad32a375a39
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests: {cpu: 10m, memory: 32Mi}
+    limits: {cpu: 200m, memory: 128Mi}
+policy:
+  # Prefer v1 when served; otherwise v1beta1. Installation fails if neither is served.
+  apiVersion: auto
+  # Disabled creates the policy but no binding. Audit does not block requests.
+  mode: Disabled
+collector:
+  enabled: false
+  intervalSeconds: 10
+  eventLimit: 500
+  resources:
+    requests: {cpu: 25m, memory: 64Mi}
+    limits: {cpu: 250m, memory: 256Mi}
+imagePullSecrets: []

@@ -1,0 +1,11 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+apiVersion: v2
+name: network-guardrail
+description: Reviewable primary-network discovery, NNCP admission guardrail, and OpenShift console plugin
+type: application
+version: 0.2.1
+appVersion: "0.2.0"
+kubeVersion: ">=1.29.0-0"
+home: https://github.com/wangzheng422/validate.policy.nncp
+sources:
+  - https://github.com/wangzheng422/validate.policy.nncp

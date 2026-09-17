@@ -1,0 +1,20 @@
+[
+  {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": "/network-guardrail",
+      "component": { "$codeRef": "GuardrailPage" }
+    }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "network-guardrail",
+      "name": "Network Guardrail",
+      "href": "/network-guardrail",
+      "perspective": "admin",
+      "section": "networking"
+    }
+  }
+]

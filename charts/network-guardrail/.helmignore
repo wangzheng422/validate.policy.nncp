@@ -1,0 +1,3 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+*.tgz
+.DS_Store

@@ -1,0 +1,38 @@
+{
+  "name": "network-guardrail",
+  "version": "0.2.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "webpack --mode production",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@openshift-console/dynamic-plugin-sdk-webpack": "1.1.0",
+    "@types/react": "17.0.89",
+    "css-loader": "7.1.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "style-loader": "4.0.0",
+    "ts-loader": "9.5.2",
+    "typescript": "5.8.3",
+    "webpack": "5.105.4",
+    "webpack-cli": "6.0.1",
+    "@openshift-console/dynamic-plugin-sdk": "1.2.0"
+  },
+  "consolePlugin": {
+    "name": "network-guardrail",
+    "version": "0.2.0",
+    "displayName": "Network Guardrail",
+    "description": "Primary-network evidence and NNCP admission guardrails",
+    "exposedModules": {
+      "GuardrailPage": "./GuardrailPage"
+    },
+    "dependencies": {
+      "@console/pluginAPI": "*"
+    }
+  },
+  "overrides": {
+    "webpack": "$webpack"
+  }
+}

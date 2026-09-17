@@ -1,0 +1,88 @@
+/* AI-Author: Codex (OpenAI model not exposed by runtime) */
+.ng-app { --ng-bg: var(--pf-v5-global--BackgroundColor--100, #fff); --ng-page: var(--pf-v5-global--BackgroundColor--200, #f5f6f7); --ng-text: var(--pf-v5-global--Color--100, #151515); --ng-muted: var(--pf-v5-global--Color--200, #535b65); --ng-border: var(--pf-v5-global--BorderColor--100, #d2d6dc); --ng-blue: var(--pf-v5-global--primary-color--100, #0066cc); background: var(--ng-page); color: var(--ng-text); min-height: calc(100vh - 80px); font: 15px/1.55 'Red Hat Text', sans-serif; }
+.ng-app * { box-sizing: border-box; }
+.ng-app h1, .ng-app h2, .ng-app h3, .ng-app p { margin: 0 0 12px; }
+.ng-app h1 { font-size: 29px; font-weight: 600; letter-spacing: -.6px; }
+.ng-app h2 { font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+.ng-app h3 { font-size: 16px; overflow-wrap: anywhere; }
+.ng-app button, .ng-app input, .ng-app select, .ng-app textarea { font: inherit; }
+.ng-app button, .ng-app summary, .ng-app select { cursor: pointer; }
+.ng-app button:focus-visible, .ng-app input:focus-visible, .ng-app select:focus-visible, .ng-app textarea:focus-visible, .ng-app summary:focus-visible { outline: 3px solid var(--ng-blue); outline-offset: 3px; }
+.ng-app button:disabled { opacity: .55; cursor: not-allowed; }
+.ng-header { padding: 28px 34px 18px; display: flex; justify-content: space-between; gap: 25px; background: var(--ng-bg); }
+.ng-header > div:first-child { max-width: 760px; }
+.ng-eyebrow { font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ng-muted); font-weight: 700; }
+.ng-toolbar { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.ng-toolbar label { display: flex; align-items: center; gap: 8px; }
+.ng-button { border: 1px solid var(--ng-blue); color: var(--ng-blue); border-radius: 4px; background: var(--ng-bg); padding: 7px 15px; }
+.ng-primary { background: var(--ng-blue); color: #fff; margin-top: 16px; }
+.ng-tabs { display: flex; gap: 25px; padding: 0 34px; background: var(--ng-bg); border-bottom: 1px solid var(--ng-border); overflow-x: auto; }
+.ng-tab { background: none; color: var(--ng-muted); border: 0; border-bottom: 3px solid transparent; padding: 16px 0; white-space: nowrap; }
+.ng-selected { color: var(--ng-blue); border-color: var(--ng-blue); font-weight: 600; }
+.ng-content { max-width: 1600px; margin: 0 auto; padding: 28px 34px 50px; }
+.ng-card { background: var(--ng-bg); border: 1px solid var(--ng-border); border-radius: 6px; padding: 24px; margin-bottom: 20px; }
+.ng-enforcement { display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--ng-blue); gap: 30px; }
+.ng-enforcement h2 { font-size: 27px; }
+.ng-status-dot { width: 22px; height: 22px; border-radius: 50%; background: #6a6e73; flex-shrink: 0; box-shadow: 0 0 0 10px #6a6e731a; }
+.ng-state-Deny { background: #3e8635; box-shadow: 0 0 0 10px #3e86351a; }
+.ng-state-Audit { background: #0066cc; box-shadow: 0 0 0 10px #0066cc1a; }
+.ng-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.ng-stats strong { font-size: 35px; font-weight: 500; }
+.ng-stats p { color: var(--ng-muted); }
+.ng-muted { color: var(--ng-muted); font-size: 14px; }
+.ng-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+.ng-action { text-align: start; color: var(--ng-text); }
+.ng-action h2 { color: var(--ng-blue); }
+.ng-action:hover { border-color: var(--ng-blue); }
+.ng-app pre { background: var(--ng-page); color: var(--ng-text); padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid var(--ng-border); border-radius: 4px; font: 13px/1.6 monospace; margin: 12px 0; max-height: 500px; overflow: auto; }
+.ng-app code { color: var(--ng-text, #151515); background-color: transparent; font-size: 13px; overflow-wrap: anywhere; }
+.ng-label { display: block; font-weight: 600; margin: 15px 0 10px; }
+.ng-label select, .ng-label input { display: block; min-width: min(380px, 100%); margin-top: 8px; }
+.ng-app select, .ng-app input, .ng-app textarea { padding: 8px 10px; border: 1px solid var(--ng-border); border-radius: 3px; color: var(--ng-text); background: var(--ng-bg); max-width: 100%; }
+.ng-app textarea { display: block; width: 100%; font-family: monospace; font-size: 13px; line-height: 1.65; resize: vertical; }
+.ng-section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ng-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.ng-good { background: #f3faf2; color: #245d1b; }
+.ng-info { background: #e7f1fa; color: #004080; }
+.ng-neutral { background: #f0f0f0; color: #4f5255; }
+.ng-danger { background: #faeae8; color: #a30000; }
+.ng-warning, .ng-error, .ng-note { border-left: 4px solid #f0ab00; background: var(--ng-bg); padding: 15px 20px; margin: 16px 0; overflow-wrap: anywhere; }
+.ng-error { border-color: #c9190b; }
+.ng-note { border-color: var(--ng-blue); }
+.ng-warning ul { margin: 8px 0 0; }
+.ng-meta { display: flex; flex-wrap: wrap; gap: 10px 30px; color: var(--ng-muted); font-size: 13px; }
+.ng-diagram { overflow-x: auto; background: var(--ng-page); border-radius: 5px; margin: 22px 0; color: var(--ng-muted); }
+.ng-diagram svg { width: 100%; display: block; max-height: 210px; }
+.ng-diagram text { font: 14px monospace; fill: var(--ng-text); }
+.ng-interface, .ng-interface-protected { fill: var(--ng-bg); stroke: var(--ng-border); stroke-width: 2; }
+.ng-interface-protected { stroke: var(--ng-blue); }
+.ng-chip { display: inline-block; border: 1px solid var(--ng-border); border-radius: 4px; padding: 2px 8px; margin: 3px; }
+.ng-details { border-top: 1px solid var(--ng-border); margin-top: 14px; padding-top: 14px; }
+.ng-app summary { color: var(--ng-blue); }
+.ng-yaml-actions { margin-top: 15px; }
+.ng-rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 14px; margin-top: 15px; }
+.ng-rule { border: 1px solid var(--ng-border); border-top: 3px solid var(--ng-blue); border-radius: 4px; padding: 16px; }
+.ng-rule pre { max-height: 260px; }
+.ng-table-wrap { overflow-x: auto; border: 1px solid var(--ng-border); background: var(--ng-bg); margin-top: 20px; }
+.ng-app table { width: 100%; border-collapse: collapse; text-align: start; font-size: 13px; }
+.ng-app th, .ng-app td { padding: 14px 16px; border-bottom: 1px solid var(--ng-border); vertical-align: top; text-align: start; }
+.ng-app th { white-space: nowrap; }
+.ng-app td { min-width: 110px; max-width: 320px; overflow-wrap: anywhere; }
+.ng-app td small { display: block; margin-top: 5px; }
+.ng-app dl { min-width: 250px; }
+.ng-app dt { font-weight: 600; margin-top: 8px; }
+.ng-app dd { margin: 0; }
+.ng-result { margin-top: 24px; padding: 24px; border-radius: 5px; }
+.ng-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 900px) { .ng-header { flex-direction: column; } .ng-stats { grid-template-columns: repeat(2, 1fr); } .ng-actions { grid-template-columns: 1fr; } .ng-header, .ng-content { padding: 20px; } .ng-tabs { padding: 0 20px; gap: 20px; } .ng-section-title { align-items: flex-start; flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .ng-app * { scroll-behavior: auto; } }
+
+.ng-control { border-top: 3px solid var(--ng-blue); }
+.ng-control-review pre { max-height: 280px; }
+.ng-control-effect { margin-top: 12px !important; }
+.ng-confirm { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; font-weight: 600; }
+.ng-confirm input { margin-top: 5px; flex-shrink: 0; }
+.ng-control-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.ng-control-actions .ng-primary { margin-top: 0; }
+.ng-stop { border-color: #a30000; color: #a30000; }
+.ng-highlight { outline: 2px solid var(--ng-blue); outline-offset: -2px; background: var(--ng-page); }

@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  network-guardrail:
+  - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2026-09-17T09:48:51.74610104+08:00"
+    description: Reviewable primary-network discovery, NNCP admission guardrail, and
+      OpenShift console plugin
+    digest: 4116b1b4c960bebe1bfc92d46186f240076ca9c99521ab048bf7961ec88b10f9
+    home: https://github.com/wangzheng422/validate.policy.nncp
+    kubeVersion: '>=1.29.0-0'
+    name: network-guardrail
+    sources:
+    - https://github.com/wangzheng422/validate.policy.nncp
+    type: application
+    urls:
+    - https://wangzheng422.github.io/validate.policy.nncp/network-guardrail-0.2.1.tgz
+    version: 0.2.1
+generated: "2026-09-17T09:48:51.745588988+08:00"

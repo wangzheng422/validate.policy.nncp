@@ -1,0 +1,63 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+apiVersion: v1
+kind: Service
+metadata:
+  name: network-guardrail-api
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: network-guardrail-api-tls
+spec:
+  selector: {app: network-guardrail-api}
+  ports:
+    - {name: https, port: 8443, targetPort: https}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-guardrail-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "network-guardrail.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels: {app: network-guardrail-api}
+  template:
+    metadata:
+      labels: {app: network-guardrail-api}
+    spec:
+      serviceAccountName: network-guardrail-api
+      securityContext:
+        {{- include "network-guardrail.podSecurity" . | nindent 8 }}
+      {{- include "network-guardrail.pullSecrets" . | nindent 6 }}
+      containers:
+        - name: api
+          image: {{ .Values.backend.image | quote }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          command: [python, -m, guardrail, serve]
+          env:
+            - name: NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - {name: TLS_CERT, value: /var/run/serving-cert/tls.crt}
+            - {name: TLS_KEY, value: /var/run/serving-cert/tls.key}
+            - name: POLICY_API_VERSION
+              value: {{ include "network-guardrail.policyVersion" . | quote }}
+          ports:
+            - {name: https, containerPort: 8443}
+          readinessProbe:
+            httpGet: {path: /healthz, port: https, scheme: HTTPS}
+          livenessProbe:
+            httpGet: {path: /healthz, port: https, scheme: HTTPS}
+            initialDelaySeconds: 10
+          securityContext:
+            {{- include "network-guardrail.containerSecurity" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          volumeMounts:
+            - {name: serving-cert, mountPath: /var/run/serving-cert, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: serving-cert
+          secret: {secretName: network-guardrail-api-tls}
+        - name: tmp
+          emptyDir: {}

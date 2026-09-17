@@ -1,0 +1,136 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+{{- if .Values.collector.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: network-guardrail-collector
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: [guardrail.openshift.io]
+    resources: [networkguardrailevents]
+    verbs: [create, list, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: network-guardrail-collector
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: network-guardrail-collector
+subjects:
+  - kind: ServiceAccount
+    name: network-guardrail-collector
+    namespace: {{ .Release.Namespace }}
+---
+# Access to one read-only audit directory; no privileged or host network access.
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: network-guardrail-audit-reader
+allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: false
+allowPrivilegedContainer: false
+allowedCapabilities: []
+defaultAddCapabilities: []
+requiredDropCapabilities: [ALL]
+readOnlyRootFilesystem: true
+runAsUser:
+  type: MustRunAs
+  uid: 0
+seLinuxContext:
+  type: MustRunAs
+  seLinuxOptions: {type: spc_t}
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+seccompProfiles: [runtime/default]
+volumes: [hostPath, emptyDir, projected, secret, configMap, downwardAPI]
+users: []
+groups: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: network-guardrail-audit-reader-scc
+  namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: [security.openshift.io]
+    resources: [securitycontextconstraints]
+    resourceNames: [network-guardrail-audit-reader]
+    verbs: [use]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: network-guardrail-audit-reader-scc
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: network-guardrail-audit-reader-scc
+subjects:
+  - kind: ServiceAccount
+    name: network-guardrail-collector
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: network-guardrail-collector
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "network-guardrail.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {app: network-guardrail-collector}
+  template:
+    metadata:
+      labels: {app: network-guardrail-collector}
+    spec:
+      serviceAccountName: network-guardrail-collector
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - {key: node-role.kubernetes.io/master, operator: Exists, effect: NoSchedule}
+        - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+      securityContext:
+        runAsUser: 0
+        seccompProfile: {type: RuntimeDefault}
+        seLinuxOptions: {type: spc_t}
+      {{- include "network-guardrail.pullSecrets" . | nindent 6 }}
+      containers:
+        - name: collector
+          image: {{ .Values.backend.image | quote }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          command: [python, -m, guardrail, collect]
+          env:
+            - name: NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - {name: AUDIT_PATH, value: /var/log/kube-apiserver/audit.log}
+            - name: INTERVAL_SECONDS
+              value: {{ .Values.collector.intervalSeconds | quote }}
+            - name: EVENT_LIMIT
+              value: {{ .Values.collector.eventLimit | quote }}
+          securityContext:
+            {{- include "network-guardrail.containerSecurity" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.collector.resources | nindent 12 }}
+          volumeMounts:
+            - {name: audit, mountPath: /var/log/kube-apiserver, readOnly: true}
+            - {name: checkpoint, mountPath: /var/lib/guardrail}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: audit
+          hostPath: {path: /var/log/kube-apiserver, type: Directory}
+        - name: checkpoint
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+{{- end }}

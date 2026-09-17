@@ -1,0 +1,85 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+{{- if .Values.plugin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: network-guardrail-console
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: network-guardrail-console-tls
+spec:
+  selector: {app: network-guardrail-console}
+  ports:
+    - {name: https, port: 9443, targetPort: https}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-guardrail-console
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "network-guardrail.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.plugin.replicas }}
+  selector:
+    matchLabels: {app: network-guardrail-console}
+  template:
+    metadata:
+      labels: {app: network-guardrail-console}
+    spec:
+      serviceAccountName: network-guardrail-console
+      automountServiceAccountToken: false
+      securityContext:
+        {{- include "network-guardrail.podSecurity" . | nindent 8 }}
+      {{- include "network-guardrail.pullSecrets" . | nindent 6 }}
+      containers:
+        - name: console
+          image: {{ .Values.plugin.image | quote }}
+          imagePullPolicy: {{ .Values.plugin.imagePullPolicy }}
+          ports:
+            - {name: https, containerPort: 9443}
+          readinessProbe:
+            httpGet: {path: /plugin-manifest.json, port: https, scheme: HTTPS}
+          livenessProbe:
+            httpGet: {path: /plugin-manifest.json, port: https, scheme: HTTPS}
+            initialDelaySeconds: 10
+          securityContext:
+            {{- include "network-guardrail.containerSecurity" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.plugin.resources | nindent 12 }}
+          volumeMounts:
+            - {name: serving-cert, mountPath: /var/run/serving-cert, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: serving-cert
+          secret: {secretName: network-guardrail-console-tls}
+        - name: tmp
+          emptyDir: {}
+{{- if .Values.plugin.register }}
+---
+apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: network-guardrail
+  labels:
+    {{- include "network-guardrail.labels" . | nindent 4 }}
+spec:
+  displayName: Network Guardrail
+  backend:
+    type: Service
+    service:
+      name: network-guardrail-console
+      namespace: {{ .Release.Namespace }}
+      port: 9443
+      basePath: /
+  proxy:
+    - alias: api
+      authorization: UserToken
+      endpoint:
+        type: Service
+        service:
+          name: network-guardrail-api
+          namespace: {{ .Release.Namespace }}
+          port: 8443
+{{- end }}
+{{- end }}

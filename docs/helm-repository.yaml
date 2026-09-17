@@ -1,0 +1,8 @@
+apiVersion: helm.openshift.io/v1beta1
+kind: HelmChartRepository
+metadata:
+  name: network-guardrail-public
+spec:
+  name: Network Guardrail
+  connectionConfig:
+    url: https://wangzheng422.github.io/validate.policy.nncp/

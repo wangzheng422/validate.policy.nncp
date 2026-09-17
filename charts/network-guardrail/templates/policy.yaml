@@ -1,0 +1,27 @@
+{{/* AI-Author: Codex (OpenAI model not exposed by runtime) */}}
+{{- if not (has .Values.policy.mode (list "Disabled" "Audit" "Deny")) -}}
+{{- fail "policy.mode must be Disabled, Audit, or Deny" -}}
+{{- end -}}
+{{- $policy := .Files.Get "files/nncp-policy.yaml" | fromYaml -}}
+{{- if not $policy.kind -}}
+{{- fail "files/nncp-policy.yaml is missing; run scripts/chart-sync-policy.sh" -}}
+{{- end -}}
+{{- $_ := set $policy "apiVersion" (include "network-guardrail.policyVersion" .) -}}
+{{ toYaml $policy }}
+{{- if ne .Values.policy.mode "Disabled" }}
+---
+apiVersion: {{ include "network-guardrail.policyVersion" . }}
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: network-guardrail
+spec:
+  policyName: network-guardrail
+  paramRef:
+    name: cluster
+    parameterNotFoundAction: Deny
+  validationActions:
+    {{- if eq .Values.policy.mode "Deny" }}
+    - Deny
+    {{- end }}
+    - Audit
+{{- end }}

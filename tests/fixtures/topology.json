@@ -1,0 +1,49 @@
+{
+  "revision": "synthetic-example",
+  "ready": true,
+  "nodes": [
+    {
+      "name": "worker-example",
+      "ready": true,
+      "roles": [
+        "worker"
+      ],
+      "primaryPath": [
+        "br-ex",
+        "enp1s0",
+        "br-int",
+        "ovn-k8s-mp0"
+      ],
+      "protectedInterfaces": [
+        "br-ex",
+        "enp1s0",
+        "br-int",
+        "ovn-k8s-mp0"
+      ],
+      "edges": [
+        {
+          "from": "br-ex",
+          "to": "br-ex",
+          "relation": "bridge-port"
+        },
+        {
+          "from": "br-ex",
+          "to": "enp1s0",
+          "relation": "bridge-port"
+        },
+        {
+          "from": "br-int",
+          "to": "ovn-k8s-mp0",
+          "relation": "bridge-port"
+        }
+      ],
+      "defaultRoutes": [
+        {
+          "destination": "0.0.0.0/0",
+          "interface": "br-ex"
+        }
+      ],
+      "warnings": []
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "upstream": "https://github.com/tt-a1i/archify",
+  "version": "2.17.0-dev.1",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "b799ab081703e7821ae5096d2c1abdf14bbdc75e8ea1c4045998c36ed6db9706",
+      "bytes": 1102
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "0b7fb59365dc21c93b0f62526d74ee913aeec9ae532c112bc76afa7edcd56e14",
+      "bytes": 5248
+    },
+    {
+      "path": "assets/JetBrainsMono-OFL.txt",
+      "sha256": "c1ab7c666206842a02b35b30770dac0d7a10156ed401c9defc3f02a754d89e90",
+      "bytes": 4398
+    },
+    {
+      "path": "assets/template.html",
+      "sha256": "003f2ddc4ec00ab37bdb0c9351cde73ccd9a82ef193a15adae6179eb4c51a735",
+      "bytes": 774214
+    },
+    {
+      "path": "renderers/architecture/grid.mjs",
+      "sha256": "f6de99c32436feed3378b0ddef516bb4732ff27a89c543b50635d4d14a15a55a",
+      "bytes": 2071
+    },
+    {
+      "path": "renderers/architecture/render-architecture.mjs",
+      "sha256": "f57077cb9fa64a8412ab0af705cb31e2e7a920114b31852882c04a76840365dc",
+      "bytes": 45546
+    },
+    {
+      "path": "renderers/shared/brand-marks.mjs",
+      "sha256": "4557b7f3eec25a3dba66a0f5da1c5dca6ec607e2a68e9be51cd697cefe9e6425",
+      "bytes": 22582
+    },
+    {
+      "path": "renderers/shared/cli.mjs",
+      "sha256": "2a6b8fa11234451627a70bca71985d80362a4c52401a90a21840d6e2ae3012d9",
+      "bytes": 10188
+    },
+    {
+      "path": "renderers/shared/desktop-readability.mjs",
+      "sha256": "b36203a11df348706e541f309266a0f9b914dac6a7eb8ba804e3abe8f8d6c710",
+      "bytes": 1089
+    },
+    {
+      "path": "renderers/shared/diagnostics.mjs",
+      "sha256": "855fea15daf2beb5be7fad0d54b72a63a4af8595f227facf845ba1852b3b365a",
+      "bytes": 4561
+    },
+    {
+      "path": "renderers/shared/engineering-profiles.mjs",
+      "sha256": "7e99f9d5423f66cc9ab6224da56dc2d5aa6c6faec29178034794e9db6b5b2889",
+      "bytes": 6936
+    },
+    {
+      "path": "renderers/shared/generated-brand-marks.mjs",
+      "sha256": "0f157d229c12df6f53763a3b88684baa5803a52484c49c4d34ec40b8743beea2",
+      "bytes": 163612
+    },
+    {
+      "path": "renderers/shared/generated-validators.mjs",
+      "sha256": "a1843e5612916e7ff71511d8577cdbea9a1355eee0ed1379de0ffd668992387f",
+      "bytes": 431711
+    },
+    {
+      "path": "renderers/shared/geometry.mjs",
+      "sha256": "161785af32241fc96df051c9be4f2bb9c3b897418d708f4a051b63f1c44952cf",
+      "bytes": 57175
+    },
+    {
+      "path": "renderers/shared/i18n.mjs",
+      "sha256": "0d9e839c3e5346160b0028d07fcf78c86671189e0714ea069dc99913e859fcdb",
+      "bytes": 48475
+    },
+    {
+      "path": "renderers/shared/layout-report.mjs",
+      "sha256": "44c2f74a20e483dd37dae6791ede39284ce3bac1a2a13872d2912999e8504df5",
+      "bytes": 1015
+    },
+    {
+      "path": "renderers/shared/legend.mjs",
+      "sha256": "4c8b37f10fb5c783a28bff6aa35bc3966155213ee32f64a8252eab5b9e64a747",
+      "bytes": 8652
+    },
+    {
+      "path": "renderers/shared/output-path.mjs",
+      "sha256": "44a5f63239703a0a56623711bb9565272488c540650cb8c3f0a3aac57928d1cf",
+      "bytes": 11645
+    },
+    {
+      "path": "renderers/shared/repository-evidence.mjs",
+      "sha256": "ce3c358093aee12790d5567de6c887ce7b9ce7961bfc742d2cf9f36eab2d4dd5",
+      "bytes": 12411
+    },
+    {
+      "path": "renderers/shared/repository-location.mjs",
+      "sha256": "e82fa68ab46e71566eb7aefdb48f6df67b34fd27ce36489e7787410dbfba05ce",
+      "bytes": 3453
+    },
+    {
+      "path": "renderers/shared/text-fit.mjs",
+      "sha256": "35b6ef2c64d88c1ea4e5aab2af7c4e8a2c2e1be62db71263787d39a9797e7dea",
+      "bytes": 2191
+    },
+    {
+      "path": "renderers/shared/utils.mjs",
+      "sha256": "20124265300eb286db184a053561005cc32b6128dc1bc1b3f9520ffa8d43a241",
+      "bytes": 11603
+    },
+    {
+      "path": "renderers/shared/validator.mjs",
+      "sha256": "7460d7fcbcdf710649256c5e96142ae26d807a655d3296ee8caf7f5e158622cc",
+      "bytes": 3508
+    },
+    {
+      "path": "scripts/check-render-output.mjs",
+      "sha256": "cd70eeb43b07b6a669e10e35f06e4e2e4ce1f7e7a6afcfcf349d75d00e0721a5",
+      "bytes": 32498
+    }
+  ]
+}

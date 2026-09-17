@@ -1,0 +1,15 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+FROM registry.access.redhat.com/ubi9/nodejs-22:latest AS build
+USER 0
+WORKDIR /opt/plugin
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY . .
+RUN npm run typecheck && npm run build
+
+FROM docker.io/nginxinc/nginx-unprivileged:1.28-alpine
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /opt/plugin/dist /usr/share/nginx/html
+USER 101
+EXPOSE 9443
+ENTRYPOINT ["nginx", "-g", "daemon off;"]

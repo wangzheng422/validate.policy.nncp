@@ -1,0 +1,43 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-guardrail-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "network-guardrail.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels: {app: network-guardrail-controller}
+  template:
+    metadata:
+      labels: {app: network-guardrail-controller}
+    spec:
+      serviceAccountName: network-guardrail-controller
+      securityContext:
+        {{- include "network-guardrail.podSecurity" . | nindent 8 }}
+      {{- include "network-guardrail.pullSecrets" . | nindent 6 }}
+      containers:
+        - name: controller
+          image: {{ .Values.backend.image | quote }}
+          imagePullPolicy: {{ .Values.backend.imagePullPolicy }}
+          command: [python, -m, guardrail, controller]
+          env:
+            - name: NAMESPACE
+              valueFrom: {fieldRef: {fieldPath: metadata.namespace}}
+            - name: INTERVAL_SECONDS
+              value: {{ .Values.controller.intervalSeconds | quote }}
+            - name: POLICY_API_VERSION
+              value: {{ include "network-guardrail.policyVersion" . | quote }}
+          securityContext:
+            {{- include "network-guardrail.containerSecurity" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}

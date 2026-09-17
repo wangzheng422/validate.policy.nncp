@@ -1,0 +1,88 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: network-guardrail
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: guardrail.openshift.io/v1alpha1
+    kind: NetworkGuardrailParameters
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [nmstate.io]
+        apiVersions: [v1, v1beta1]
+        operations: [CREATE, UPDATE]
+        resources: [nodenetworkconfigurationpolicies]
+        scope: Cluster
+  variables:
+    - name: desired
+      expression: "has(object.spec.desiredState) ? dyn(object.spec.desiredState) : dyn({})"
+    - name: interfaces
+      expression: "'interfaces' in variables.desired ? variables.desired['interfaces'] : []"
+    - name: selector
+      expression: "has(object.spec.nodeSelector) ? object.spec.nodeSelector : {}"
+    - name: targets
+      expression: "params.spec.nodes.filter(n, variables.selector.all(k, k in n.labels && n.labels[k] == variables.selector[k]))"
+    - name: routes
+      expression: "'routes' in variables.desired && 'config' in variables.desired['routes'] ? variables.desired['routes']['config'] : []"
+  validations:
+    - expression: "params.spec.ready && size(params.spec.nodes) > 0"
+      message: "GR-000 DISCOVERY: a complete, manually reviewed parameter snapshot is required"
+    - expression: "size(variables.selector) > 0 && size(variables.targets) > 0"
+      message: "GR-001 SCOPE: nodeSelector must select known nodes in the approved inventory"
+    - expression: "has(object.spec.maxUnavailable) && type(object.spec.maxUnavailable) == int && object.spec.maxUnavailable == 1"
+      message: "GR-002 BLAST_RADIUS: maxUnavailable must be the integer 1"
+    - expression: "variables.interfaces.all(i, 'name' in i && !(i['name'] in params.spec.protectedInterfaces))"
+      message: "GR-003 PRIMARY_NETWORK: a protected OVN or primary interface cannot be modified or removed"
+    - expression: >-
+        !variables.targets.exists(n, 'master' in n.roles || 'control-plane' in n.roles)
+        || (size(variables.targets) == 1 && 'kubernetes.io/hostname' in variables.selector)
+      message: "GR-004 CONTROL_PLANE: control-plane changes require an explicit single hostname target"
+    - expression: "!('dns-resolver' in variables.desired) || size(variables.interfaces) == 0"
+      message: "GR-005 DNS_ONLY: submit DNS changes separately without any interfaces"
+    - expression: >-
+        variables.interfaces.all(i,
+          (!('controller' in i) || !(i['controller'] in params.spec.protectedInterfaces)) &&
+          ['vlan', 'vxlan', 'mac-vlan', 'mac-vtap', 'ipvlan'].all(t,
+            !(t in i) || !('base-iface' in i[t]) || !(i[t]['base-iface'] in params.spec.protectedInterfaces)) &&
+          (!('link-aggregation' in i) || !('port' in i['link-aggregation']) ||
+            i['link-aggregation']['port'].all(p, !(p in params.spec.protectedInterfaces))) &&
+          (!('vrf' in i) || !('port' in i['vrf']) ||
+            i['vrf']['port'].all(p, !(p in params.spec.protectedInterfaces))) &&
+          (!('bridge' in i) || !('port' in i['bridge']) ||
+            i['bridge']['port'].all(p,
+              'name' in p && !(p['name'] in params.spec.protectedInterfaces) &&
+              (!('link-aggregation' in p) || !('port' in p['link-aggregation']) ||
+                p['link-aggregation']['port'].all(b, 'name' in b && !(b['name'] in params.spec.protectedInterfaces))))))
+        && !('ovs-db' in variables.desired)
+      message: "GR-006 DEPENDENCIES: protected controller, bond, VLAN, bridge dependencies and global OVS DB edits are forbidden"
+    - expression: >-
+        variables.routes.all(r,
+          'destination' in r &&
+          r['destination'].matches('^[0-9a-fA-F:.]+/[1-9][0-9]*$') &&
+          r['destination'] != '0.0.0.0/0' &&
+          !r['destination'].endsWith('/0') &&
+          (!('next-hop-interface' in r) || !(r['next-hop-interface'] in params.spec.protectedInterfaces)))
+        && !('route-rules' in variables.desired)
+      message: "GR-007 ROUTING: default, wildcard, primary-interface routes and routing-rule changes are forbidden"
+    - expression: >-
+        size(variables.targets) == 1 && 'kubernetes.io/hostname' in variables.selector
+      message: "GR-008 CANARY: use an explicit single known hostname; reviewed snapshots cannot authorize broad or future nodes"
+    - expression: >-
+        !has(object.spec.capture) && variables.interfaces.all(i,
+          'name' in i && i['name'].matches('^[a-zA-Z0-9_.-]+$') &&
+          (!('identifier' in i) || i['identifier'] == 'name') &&
+          !('profile-name' in i))
+      message: "GR-009 LITERAL_TARGETS: capture templates, wildcard names, MAC targeting and profile aliases require separate review and are unsupported"
+    - expression: >-
+        variables.interfaces.all(i, ['ipv4', 'ipv6'].all(f,
+          !(f in i) ||
+          (!(('dhcp' in i[f] && i[f]['dhcp'] == true) || ('autoconf' in i[f] && i[f]['autoconf'] == true))) ||
+          (['auto-routes', 'auto-gateway', 'auto-dns'].all(k, k in i[f] && i[f][k] == false))))
+      message: "GR-010 DYNAMIC_NETWORK: DHCP or autoconf must explicitly disable auto-routes, auto-gateway and auto-dns"
+  auditAnnotations:
+    - key: inventory-revision
+      valueExpression: "string(params.spec.revision)"
+    - key: requested-interfaces
+      valueExpression: "variables.interfaces.map(i, 'name' in i ? string(i['name']) : '?').join(',')"

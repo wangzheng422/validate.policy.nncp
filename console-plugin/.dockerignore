@@ -1,0 +1,6 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+node_modules
+dist
+.git
+tests
+validation.log

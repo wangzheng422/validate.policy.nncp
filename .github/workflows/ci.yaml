@@ -1,0 +1,64 @@
+# AI-Author: Codex (OpenAI model not exposed by runtime)
+name: Validate Network Guardrail
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # Official action tag refs and action.yml inspected on 2026-09-16.
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install Python dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Test backend
+        run: python -m unittest discover -s tests -v
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Validate Archify runtime with synthetic topology fixtures
+        run: node topology/test-runtime.mjs
+      - name: Build Console plugin
+        working-directory: console-plugin
+        run: |
+          npm ci --ignore-scripts
+          npm run typecheck
+          npm run build
+      - name: Install checksum-verified Helm
+        env:
+          HELM_VERSION: v3.18.6
+          # Verified against https://get.helm.sh/helm-v3.18.6-linux-amd64.tar.gz.sha256sum
+          HELM_SHA256: 3f43c0aa57243852dd542493a0f54f1396c0bc8ec7296bbb2c01e802010819ce
+        run: |
+          set -euo pipefail
+          helm_download="$(mktemp -d)"
+          trap 'rm -rf "$helm_download"' EXIT
+          archive="helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
+            "https://get.helm.sh/${archive}" -o "$helm_download/$archive"
+          printf '%s  %s\n' "$HELM_SHA256" "$helm_download/$archive" | sha256sum --check --strict
+          tar -xzf "$helm_download/$archive" -C "$helm_download" linux-amd64/helm
+          mkdir -p "$RUNNER_TEMP/network-guardrail-bin"
+          install -m 0755 "$helm_download/linux-amd64/helm" "$RUNNER_TEMP/network-guardrail-bin/helm"
+          printf '%s\n' "$RUNNER_TEMP/network-guardrail-bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/network-guardrail-bin/helm" version --short
+      - name: Validate Helm policy and render matrix
+        run: bash scripts/chart-validate.sh
