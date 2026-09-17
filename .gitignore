@@ -10,3 +10,6 @@ env.txt
 .env
 wzh-*/
 wzh-*
+
+# Generated local admission-test report is not source.
+docs/admission-validation.md
